@@ -14,7 +14,7 @@ CREATE TABLE tb_customers (
 CREATE TABLE tb_products (
     product_id INT AUTO_INCREMENT PRIMARY KEY,
     product_name VARCHAR(100) NOT NULL,
-    category VARCHAR(50), -- RAM, CPU, GPU
+    category VARCHAR(50),
     brand VARCHAR(30),
     unit_price DECIMAL(10, 2)
 );
@@ -23,7 +23,7 @@ CREATE TABLE tb_memoryRAM (
     ram_id INT AUTO_INCREMENT PRIMARY KEY,
     product_id INT,
     gb INT NOT NULL,
-    gen VARCHAR(10) NOT NULL, -- DDR4, DDR5
+    gen VARCHAR(10) NOT NULL,
     velocity INT NOT NULL,
     stock_quantity INT DEFAULT 0,
     FOREIGN KEY (product_id) REFERENCES tb_products(product_id)
@@ -31,11 +31,11 @@ CREATE TABLE tb_memoryRAM (
 
 CREATE TABLE tb_sales (
     sale_id INT AUTO_INCREMENT PRIMARY KEY,
-    sale_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    sale_date DATETIME,
     customer_id INT,
     product_id INT,
     quantity_sold INT,
-    final_price DECIMAL(10, 2), -- Price at the moment of purchase
+    final_price DECIMAL(10, 2),
     FOREIGN KEY (customer_id) REFERENCES tb_customers(customer_id),
     FOREIGN KEY (product_id) REFERENCES tb_products(product_id)
 );
@@ -57,12 +57,13 @@ VALUES ('John', 'Doe', 'john@email.com', 'New York', '2023-01-15'),
        ('Alice', 'Smith', 'alice@email.com', 'Los Angeles', '2023-05-20'),
        ('Bob', 'Johnson', 'bob@email.com', 'Chicago', '2023-11-02');
 
-INSERT INTO tb_sales (customer_id, product_id, quantity_sold, final_price)
-VALUES (1, 1, 2, 45.00), -- John bought 2 units of product 1
-       (2, 4, 1, 190.00), -- Alice bought 1 unit of product 4
-       (3, 2, 1, 85.00);  -- Bob bought 1 unit of product 2
+INSERT INTO tb_sales (customer_id, product_id, quantity_sold, final_price, sale_date)
+VALUES (1, 1, 2, 45.00, '2026-02-23 17:00:00'),
+       (2, 4, 1, 190.00, '2026-02-26 17:00:00'),
+       (3, 2, 1, 85.00, '2026-01-17 17:00:00');
 
 SELECT * FROM tb_products;
+SELECT * FROM tb_sales;
 
 SELECT 
     s.sale_date,
@@ -85,3 +86,13 @@ FROM
 WHERE
 	tbmemoria.gen='DDR5' AND tbmemoria.velocity<5000;
     
+SELECT
+	tbcompradores.email,
+	tbvendas.sale_date
+FROM
+	tb_customers tbcompradores 
+JOIN
+	tb_sales tbvendas ON tbcompradores.customer_id = tbvendas.customer_id
+WHERE
+	tbvendas.sale_date >= (CURRENT_DATE - INTERVAL 1 MONTH);
+
